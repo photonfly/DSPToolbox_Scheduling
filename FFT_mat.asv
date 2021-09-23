@@ -1,0 +1,7 @@
+%function mat = FFT_mat(N)
+clc;clear;close all;
+N = 4;
+
+butterflyids =  N + (N/2)*log2(N) - 1: -1 : N ;
+mat = reshape(butterflyids,[N/2,log2(N)]);
+%end
