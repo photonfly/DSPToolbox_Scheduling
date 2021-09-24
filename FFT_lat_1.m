@@ -6,8 +6,8 @@ function latency = FFT_lat_1(N,K,N_pe)
     extra_ccSample =  max(operationsSample - N_pe*K,zeros(1,log2(N)+1));
     mult = sample_Stage.*extra_ccSample;
     extra_op = sum(mult)+N_br;
-    intem_op = extra_op - N/2;
-    intem_cc = ceil((intem_op+1)/N_pe);
+    intem_op = extra_op - N;
+    intem_cc = ceil((intem_op+3)/N_pe);
     latency = K+intem_cc; 
    
     %latency = ceil((sum(mult)-N/2+1)/N_pe)+K+log2(N_pe);

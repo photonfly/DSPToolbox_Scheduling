@@ -46,13 +46,13 @@ butterfly_ids = zeros(1,N_op);
 % it starts from N + N/2 (inputs + first layer btf
 %ends at the last btf index: N + N_op
 %printstarttimes(schedule);
-butterflyids = N + layers_stay*N/2 + 1:N + N_op;
+butterflyids = N + layers_stay*N/2 + 1:N_op;
 move_sequence = btf_sequence_gen(schedule,butterflyids);
 %for btf_id_move = butterflyids
 %T = zeros(1,length(butterflyids));
 % What is the distance to be moved?
 % for i = 1 : length(butterflyids)
-for i = 1 : length(butterflyids)-N+1
+for i = 1 : length(butterflyids)
     btf_id_move = move_sequence(i,1);
     min_value = getlowerbound(schedule, move_sequence(i,3));
     [distance,start_time_aftermove_0] = distance_to_move(schedule, btf_id_move, min_value,start_time_array,N_PE);
@@ -64,12 +64,14 @@ for i = 1 : length(butterflyids)-N+1
     %fprintf('Current Op is %d, start_time_aftermove is %d \n',btf_id_move,start_time_aftermove_0);
     %plotschedule(schedule);
 end
-plotschedule(schedule);
-plotprecedence(sfg);
+% plotschedule(schedule);
+% plotprecedence(sfg);
 %% second last and last layer
 btf_ids = second_last_trans(N);
 last_btf_ids = N_op :-1: N_op - N/2 + 1;
-target_time = getstarttimes(schedule,"butterfly2",btf_ids(1))+1;
+target_time = max(start_time_array)+1;
+schedule = moveoperand(schedule, btf_ids(1),target_time);
+target_time = target_time + 1;
 for i = 2:N/2
     schedule = moveoperand(schedule, btf_ids(i),target_time);
     target_time = target_time + 1;
@@ -94,7 +96,7 @@ schedule = moveoperand(schedule, last_btf_ids(i),target_time);
 %     fprintf('Current Op is %d, start_time_aftermove is %d \n',btf_id_move,start_time_aftermove_0);
 %     %plotschedule(schedule);
 % end
-plotschedule(schedule);
+%plotschedule(schedule);
 %% move forward outputs
 %output index in schedule
 % output_index = N + N_op + 1 : 2*N + N_op;
@@ -117,23 +119,23 @@ end
 schedule = changeendTime(schedule,target_time-1); % Change end time
 
 %% For debugging
-init_schedule_time = K*(N-1)+log2(N);
-extra_cc = schedule(1,1) - init_schedule_time;
-ops = sum(start_time_array>=K*N);
-
-%ops = sum(start_time_array>=init_schedule_time);
-extra_op = extra_op_func(N,K,N_PE);
-% fprintf("The extra_cc = %d \n",extra_cc);
-% fprintf("Expression,the extra_op is %d\n",extra_op);
-fprintf("While K = %d, N = %d, N_pe = %d\n",K,N,N_PE);
-diff = ops - extra_op;
-outputmat = [ops,extra_op,diff,extra_cc];
-fprintf("The [sch_extra_op,ex_extra_op,extra_cc] \n");
-disp(outputmat);
+% init_schedule_time = K*(N-1)+log2(N);
+% extra_cc = schedule(1,1) - init_schedule_time;
+% ops = sum(start_time_array>=K*N);
+% 
+% %ops = sum(start_time_array>=init_schedule_time);
+% extra_op = extra_op_func(N,K,N_PE);
+% % fprintf("The extra_cc = %d \n",extra_cc);
+% % fprintf("Expression,the extra_op is %d\n",extra_op);
+% fprintf("While K = %d, N = %d, N_pe = %d\n",K,N,N_PE);
+% diff = ops - extra_op;
+% outputmat = [ops,extra_op,diff,extra_cc];
+% fprintf("The [sch_extra_op,ex_extra_op,extra_cc] \n");
+% disp(outputmat);
 
 %% Latency
 % Get the time of last input
- Startime_last_input = K*(N-1);
+Startime_last_input = K*(N-1);
 % Get the time of last output
 startTimeArrayOut = schedule(end:-1:end-N+1,10);
 startTimeFirstOut = min(startTimeArrayOut);
