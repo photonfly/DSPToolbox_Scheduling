@@ -105,16 +105,11 @@ plotschedule(schedule);
 %     [anySpace, btf_id_move,min_value] = isAnySpace(schedule,output_index);
 % end
 % schedule = changeendTime(schedule,out_time); % Change end time
-%plotschedule(schedule);
-%tEnd = toc(tStart) ;
+% %plotschedule(schedule);
+% %tEnd = toc(tStart) ;
 %% output L = 1
-target_time = getstarttimes(schedule,'butterfly2',last_btf_ids(1)) + 1;
-output_index = N : 2*N-1;
-for i = 1:N
-    schedule = moveoutputs(schedule, output_index(i),target_time);
-    target_time = target_time + 1;
-end
-schedule = changeendTime(schedule,target_time-1); % Change end time
+firstOutputId = N + N_op + 1;
+
 
 %% For debugging
 init_schedule_time = K*(N-1)+log2(N);
